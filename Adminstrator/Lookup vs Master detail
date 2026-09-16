@@ -19,4 +19,11 @@
             only 2 master detail
             38 lookup + 2 master detail.
 
-  Note:- Rollup summary can be created in parent side only, If records exist can not be created,                                      
+  Note: - Roll-up Summary: CAN be created even if records exist, as long as the Master-Detail relationship is
+          already in place.
+
+  Note:- Master-Detail Relationship: CANNOT be created directly if child records already exist without a parent. 
+         To resolve this:
+                           Create the field as a Lookup.
+                           Populate the parent ID on all existing child records (so there are no "orphaned" records).
+                           Convert the Lookup field to a Master-Detail field.
