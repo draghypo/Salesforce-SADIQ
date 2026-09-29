@@ -1,9 +1,12 @@
                             Why Salesforce has introduced govenor limits in salesforce
                         --------------------------------------------------------------------
-  Salesforce introduced Governor Limits to protect its multi-tenant architecture. Since many companies share the same cloud
-  servers and database, bad code from one company could slow down or crash the system for everyone else—this is called 
-  the 'noisy neighbor' effect. Governor Limits set strict rules on resources like CPU time, memory, and database queries 
-  so no single company can hog the server.
+**Salesforce follow the multi tenat archtecture: -** Multi-tenant means multiple companies share the exact same underlying technology, software servers, and database hardware, while keeping their data completely private and isolated.
+
+  
+**Reason: -** Salesforce introduced Governor Limits to protect its multi-tenant architecture. Since many companies share the same cloud
+servers and database, bad code from one company could slow down or crash the system for everyone else—this is called 
+the 'noisy neighbor' effect. Governor Limits set strict rules on resources like CPU time, memory, and database queries 
+so no single company can hog the server.
 
   In simple Hinglish some points : - 
   * **Shared Storage (Hyperforce / AWS):** Infosys, TCS, aur Accenture—teeno ka data Hyperforce (AWS) ke andar ek hi shared database engine par hota hai.
