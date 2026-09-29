@@ -44,4 +44,50 @@ Handler: - public class ParentAchiever {
         }     
     }
 }
+
+
+trigger ParentAchiever on Contact (after insert, after update, after delete, after undelete) {
+    ParentAchiever.achieveParents(Trigger.new, Trigger.oldMap);
+}
+
+public class ParentAchiever {
+    public static void achieveParents(List<Contact> newList, Map<Id, Contact> oldMap) {
+        Set<Id> accIds = new Set<Id>();
+
+        if (newList != null) {
+            for (Contact con : newList) {
+                Contact oldCon = (oldMap != null) ? oldMap.get(con.Id) : null;
+                // On update, only act if salary or account actually changed
+                if (oldCon == null || con.AccountId != oldCon.AccountId || con.Salary__c != oldCon.Salary__c) {
+                    if (con.AccountId != null) accIds.add(con.AccountId);
+                    if (oldCon != null && oldCon.AccountId != null) accIds.add(oldCon.AccountId);
+                }
+            }
+        } else if (oldMap != null) { // delete
+            for (Contact con : oldMap.values()) {
+                if (con.AccountId != null) accIds.add(con.AccountId);
+            }
+        }
+
+        if (accIds.isEmpty()) return;
+
+        // Default to 0, only for accounts that still exist
+        Map<Id, Account> accMap = new Map<Id, Account>();
+        for (Account acc : [SELECT Id FROM Account WHERE Id IN :accIds]) {
+            accMap.put(acc.Id, new Account(Id = acc.Id, Sum_of_salary__c = 0));
+        }
+        if (accMap.isEmpty()) return;
+
+        for (AggregateResult ag : [SELECT AccountId accId, SUM(Salary__c) totalSal FROM Contact WHERE AccountId IN :accMap.keySet()
+                                                                                                             GROUP BY AccountId]) {
+            Decimal total = (Decimal) ag.get('totalSal');
+            accMap.get((Id) ag.get('accId')).Sum_of_salary__c = (total == null) ? 0 : total;
+        }
+
+        update accMap.values();
+    }
+}
+
+
+
 ******************************************************************************************************************************
