@@ -1,4 +1,5 @@
-1. Write a trigger to stop a user from deleting an Account if it has related Contacts.
+                     Trigger to stop a user from deleting an Account if it has related Contacts.
+                  ***********************************************************************************
 
                       trigger AccountTrigger on Account (before delete) {
                           Set<Id> accountIds = Trigger.oldMap.keySet();
@@ -10,10 +11,9 @@
                           }
                       }
                       
-
-
 *************************************************************************************************************************************
-Rollup summary achievement Account contact through contact:- 
+                      Rollup summary achievement Account contact through contact
+                    **************************************************************
 Trigger:-  trigger ParentAchiever on Contact (After insert, After update, After delete, After undelete) {
                if(Trigger.isAfter && (Trigger.isUpdate || Trigger.isInsert || Trigger.isUndelete || Trigger.isDelete)) {
                   ParentAchiever.achieveParents(Trigger.isDelete ? Trigger.old : Trigger.New); 
@@ -91,8 +91,9 @@ public class ParentAchiever {
 
 
 ***************************************************************************************************************************************************************************************************************
-Scenario: Update Related Contacts When Account Field Changes.
-Business Requirement: Whenever an Account’s Industry changes, all related Contacts Department field should be updated to match the Account’s Industry.
+                            Scenario: Update Related Contacts When Account Field Changes.
+      Whenever an Account Industry change related Contacts Department field should be aligned with the Account’s Industry.
+    ***********************************************************************************************************************
 
 trigger AccountTrigger on Account (after update) {
     if (Trigger.isAfter && Trigger.isUpdate) {
