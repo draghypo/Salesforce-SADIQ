@@ -126,4 +126,55 @@ public class AccountTriggerHandler {
         }
     }
 }
+Suggestion go with the queaable class we do not not the how many contacts will be in one account could be 1000000 so better to go queable.
+
+public with sharing class AccountTriggerHandler {
+
+    public static void syncContactDepartment(List<Account> newAccounts, Map<Id, Account> oldMap) {
+        Map<Id, String> accIdToIndustry = new Map<Id, String>();
+        for (Account acc : newAccounts) {
+            Account oldAcc = oldMap.get(acc.Id);
+            if (acc.Industry != oldAcc.Industry) {
+                accIdToIndustry.put(acc.Id, acc.Industry);
+            }
+        }
+        if (accIdToIndustry.isEmpty()) return;
+        System.enqueueJob(new ContactDepartmentSyncQueueable(accIdToIndustry));
+    }
+}
+
+public with sharing class ContactDepartmentSyncQueueable implements Queueable {
+
+    private static final Integer MAX_DML_ROWS = 10000;
+    private Map<Id, String> accIdToIndustry;
+
+    public ContactDepartmentSyncQueueable(Map<Id, String> accIdToIndustry) {
+        this.accIdToIndustry = accIdToIndustry;
+    }
+
+    public void execute(QueueableContext ctx) {
+        List<Contact> contactsToUpdate = new List<Contact>();
+        Boolean hasMore = false;
+        for (Contact con : [SELECT Id, AccountId, Department FROM Contact WHERE AccountId IN :accIdToIndustry.keySet()]) {
+            String newDept = accIdToIndustry.get(con.AccountId);
+            if (con.Department == newDept) continue;
+            if (contactsToUpdate.size() == MAX_DML_ROWS) {
+                hasMore = true;
+                break;
+            }
+            con.Department = newDept;
+            contactsToUpdate.add(con);
+        }
+
+        if (!contactsToUpdate.isEmpty()) {
+            update contactsToUpdate;
+        }
+
+        // Re-enqueue for the remainder. Already-updated Contacts are skipped
+        // by the Department check, so each run makes progress.
+        if (hasMore) {
+            System.enqueueJob(new ContactDepartmentSyncQueueable(accIdToIndustry));
+        }
+    }
+}
 ***************************************************************************************************************************************************************
