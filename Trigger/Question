@@ -90,10 +90,9 @@ public class ParentAchiever {
 
 
 
-******************************************************************************************************************************
-
-
-
+***************************************************************************************************************************************************************************************************************
+Scenario: Update Related Contacts When Account Field Changes.
+Business Requirement: Whenever an Account’s Industry changes, all related Contacts Department field should be updated to match the Account’s Industry.
 
 trigger AccountTrigger on Account (after update) {
     if (Trigger.isAfter && Trigger.isUpdate) {
@@ -101,9 +100,7 @@ trigger AccountTrigger on Account (after update) {
     }
 }
 
-
-public with sharing class AccountTriggerHandler {
-
+public class AccountTriggerHandler {
     public static void syncContactDepartment(List<Account> newAccounts, Map<Id, Account> oldMap) {
         Map<Id, String> accIdToIndustry = new Map<Id, String>();
         for (Account acc : newAccounts) {
@@ -128,3 +125,4 @@ public with sharing class AccountTriggerHandler {
         }
     }
 }
+***************************************************************************************************************************************************************
