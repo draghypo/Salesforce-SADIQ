@@ -1,26 +1,5 @@
 1. Write a trigger to stop a user from deleting an Account if it has related Contacts.
-           Trigger:-  trigger RestrictContactDeleteion on Account (Before delete) {
-                      if(Trigger.isDelete && Trigger.isBefore) {
-                          TriggerPractionerCommonHandler.restrictContactDeletion(Trigger.oldMap);
-                      }
-                  }
-             Handler: -  public class TriggerPractionerCommonHandler {
-                          public static void restrictContactDeletion(Map<Id,Account> accMap) {
-                              Set<Id> accId = new Set<Id>();
-                              List<Contact> accList = [SELECT Accountid FROM Contact WHERE Accountid in : accMap.keySet()];
-                              for(Contact ac : accList) {
-                                 accId.add(ac.accountid);
-                              }
-                              for(Account acc: accMap.values()) {
-                                  if(accId.contains(acc.Id)) {
-                                      acc.addError('Account has a contact, can not be deleted.');
-                                  }
-                              }    
-                          }
-                      }
 
-
-2nd approach:- 
                       trigger AccountTrigger on Account (before delete) {
                           Set<Id> accountIds = Trigger.oldMap.keySet();
                           Map<Id, Account> accountsWithContacts = new Map<Id, Account>([SELECT Id FROM Account WHERE Id IN :accountIds AND Id IN (SELECT AccountId FROM Contact)]);
