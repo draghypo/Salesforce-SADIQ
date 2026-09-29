@@ -91,3 +91,40 @@ public class ParentAchiever {
 
 
 ******************************************************************************************************************************
+
+
+
+
+trigger AccountTrigger on Account (after update) {
+    if (Trigger.isAfter && Trigger.isUpdate) {
+        AccountTriggerHandler.syncContactDepartment(Trigger.new, Trigger.oldMap);
+    }
+}
+
+
+public with sharing class AccountTriggerHandler {
+
+    public static void syncContactDepartment(List<Account> newAccounts, Map<Id, Account> oldMap) {
+        Map<Id, String> accIdToIndustry = new Map<Id, String>();
+        for (Account acc : newAccounts) {
+            Account oldAcc = oldMap.get(acc.Id);
+            if (acc.Industry != oldAcc.Industry) {
+                accIdToIndustry.put(acc.Id, acc.Industry);
+            }
+        }
+        if (accIdToIndustry.isEmpty()) return;
+     
+        List<Contact> contactsToUpdate = new List<Contact>();
+        for (Contact con : [SELECT Id, AccountId, Department FROM Contact WHERE AccountId IN :accIdToIndustry.keySet()]) {
+            String newDept = accIdToIndustry.get(con.AccountId);
+            if (con.Department != newDept) {
+                con.Department = newDept;
+                contactsToUpdate.add(con);
+            }
+        }
+
+        if (!contactsToUpdate.isEmpty()) {
+            update contactsToUpdate;
+        }
+    }
+}
