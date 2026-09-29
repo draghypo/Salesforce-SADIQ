@@ -4,10 +4,10 @@ Ans: -  Due to the Data Corruption, As we do not know the when Asynchronus will 
         future method and in behind the scene same record has been changed by someone so process will be killed like 
         data will be overriden. that is the reason future method does not accept the non premitive data type.
 
-Follow up question: - Above is the reson for non premitive datatype in future method how it works in schedulable?
+Follow up question: - Above is the reson for non premitive datatype in future method how it works in Queueable?
     Ans :- 
           Future Methods are static methods. They take inputs directly as parameters. Salesforce has to instantly 
           serialize those parameters and dump them into a background system queue.
 
-          Schedulable Classes are object-oriented. You instantiate the class as an object using the new keyword, and 
+          Queueable Classes are object-oriented. You instantiate the class as an object using the new keyword, and 
           you can pass non-primitive data into its constructor.
